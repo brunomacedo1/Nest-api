@@ -1,4 +1,6 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-inferrable-types */
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards} from '@nestjs/common';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { hasRoles } from 'src/auth/decorator/roles.decorator';
@@ -12,7 +14,7 @@ import { UserService } from '../service/user.service';
 export class UserController {
   constructor(private userService: UserService) { }
 
-  @Post('/create')
+  @Post('')
   create(@Body() user: User): Observable<User | unknown> {
     return this.userService.create(user).pipe(
       map((user: User) => user),
@@ -36,17 +38,12 @@ export class UserController {
 
   @hasRoles(UserRole.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get()
-  findAll(): Observable<User[]> {
-    return this.userService.findAll();
-  }
-
-  @Delete('/delete/:id')
+  @Delete(':id')
   deleteOne(@Param('id') id: string): Observable<User> {
     return this.userService.deleteOne(Number(id));
   }
 
-  @Put('/update/:id')
+  @Put(':id')
   updateOne(@Param('id') id: string, @Body() user: User): Observable<any> {
     return this.userService.updateOne(Number(id), user);
   }
@@ -57,6 +54,19 @@ export class UserController {
   @Put(':id/role')
   updateRoleOfUser(@Param('id') id: string, @Body() user: User): Observable<User> {
     return this.userService.updateRoleOfUser(Number(id), user);
+  }
+
+  @Get()
+  index(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Observable<Pagination<User>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.userService.paginate({
+      page: Number(page), 
+      limit: Number(limit),
+      route: 'http://localhost:3000/users',
+    });
   }
 
 }
