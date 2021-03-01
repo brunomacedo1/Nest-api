@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards} from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Observable, of } from 'rxjs';
@@ -60,6 +59,7 @@ export class UserController {
   index(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('username') username: string,
   ): Observable<Pagination<User>> {
     limit = limit > 100 ? 100 : limit;
     return this.userService.paginate({

@@ -6,10 +6,13 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { routes } from './routes';
+import { RouterModule } from 'nest-router';
 
 @Module({
 
   imports: [
+    RouterModule.forRoutes(routes),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
